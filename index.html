@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Siklus Hidup Satwa - Kelas 3 SD</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Quicksand for Kid-Friendly Aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Tone.js for Web Audio FX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            yellow: '#FFD166',
+                            green: '#06D6A0',
+                            blue: '#118AB2',
+                            red: '#EF476F',
+                            purple: '#8338EC',
+                            dark: '#073B4C'
+                        }
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        quicksand: ['Quicksand', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #F4F9F9;
+            user-select: none;
+        }
+        h1, h2, h3, h4, button, .font-fun {
+            font-family: 'Fredoka', cursive;
+        }
+        .btn-bounce {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+        .card-shadow {
+            box-shadow: 0 8px 0px 0px rgba(0,0,0,0.15);
+        }
+        .card-shadow-sm {
+            box-shadow: 0 4px 0px 0px rgba(0,0,0,0.12);
+        }
+        /* Custom animations */
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 3s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 2.5s infinite ease-in-out;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #E2E8F0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #06D6A0;
+            border-radius: 10px;
+        }
+        .drag-selected {
+            ring: 4px;
+            ring-color: #FFD166;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="text-brand-dark min-h-screen flex flex-col justify-between bg-emerald-50">
+
+    <!-- TOP HEADER / NAVBAR -->
+    <header class="bg-white border-b-4 border-brand-green sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('beranda')">
+                <div class="bg-brand-yellow p-2 rounded-2xl text-2xl text-brand-dark animate-float shadow">
+                    🐸
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-brand-blue leading-none">Dunia Satwa</h1>
+                    <p class="text-xs font-semibold text-emerald-600">Siklus Hidup & Metamorfosis</p>
+                </div>
+            </div>
+
+            <!-- Global Score & Level -->
+            <div class="flex items-center space-x-3 bg-emerald-100 px-3 py-1.5 rounded-full border-2 border-emerald-300">
+                <div class="flex items-center space-x-1">
+                    <span class="text-xl">⭐</span>
+                    <span id="global-score" class="font-bold text-lg text-emerald-800">0</span>
+                    <span class="text-xs text-emerald-600 font-bold">Poin</span>
+                </div>
+                <div class="h-4 w-0.5 bg-emerald-300"></div>
+                <div class="flex items-center space-x-1">
+                    <span class="text-xs font-bold text-emerald-700">Level:</span>
+                    <span id="user-level-badge" class="bg-brand-purple text-white text-xs px-2 py-0.5 rounded-full font-bold">Pemula</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION MENU -->
+        <nav class="bg-emerald-600 text-white shadow-inner">
+            <div class="max-w-6xl mx-auto px-2 flex justify-around md:justify-center md:space-x-4 overflow-x-auto text-xs md:text-sm font-bold">
+                <button onclick="navigateTo('beranda')" id="nav-beranda" class="nav-btn py-2.5 px-3 flex items-center space-x-1 border-b-4 border-transparent hover:bg-emerald-700 transition">
+                    <span>🏠</span><span>Beranda</span>
+                </button>
+                <button onclick="navigateTo('materi')" id="nav-materi" class="nav-btn py-2.5 px-3 flex items-center space-x-1 border-b-4 border-transparent hover:bg-emerald-700 transition">
+                    <span>📚</span><span>Materi</span>
+                </button>
+                <button onclick="navigateTo('simulasi')" id="nav-simulasi" class="nav-btn py-2.5 px-3 flex items-center space-x-1 border-b-4 border-transparent hover:bg-emerald-700 transition">
+                    <span>🔬</span><span>Simulasi</span>
+                </button>
+                <button onclick="navigateTo('permainan')" id="nav-permainan" class="nav-btn py-2.5 px-3 flex items-center space-x-1 border-b-4 border-transparent hover:bg-emerald-700 transition">
+                    <span>🎮</span><span>Permainan</span>
+                </button>
+                <button onclick="navigateTo('kuis')" id="nav-kuis" class="nav-btn py-2.5 px-3 flex items-center space-x-1 border-b-4 border-transparent hover:bg-emerald-700 transition">
+                    <span>📝</span><span>Kuis</span>
+                </button>
+                <button onclick="navigateTo('hasil')" id="nav-hasil" class="nav-btn py-2.5 px-3 flex items-center space-x-1 border-b-4 border-transparent hover:bg-emerald-700 transition">
+                    <span>🏆</span><span>Hasil</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- GLOBAL PROGRESS BAR -->
+        <div class="mb-6 bg-white p-3 rounded-2xl border-2 border-emerald-200 card-shadow-sm flex items-center space-x-3">
+            <span class="text-xs font-bold text-gray-500 whitespace-nowrap">Progres Petualangan:</span>
+            <div class="w-full bg-gray-200 h-4 rounded-full overflow-hidden p-0.5 border">
+                <div id="overall-progress" class="bg-gradient-to-r from-brand-yellow to-brand-green h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+            </div>
+            <span id="overall-progress-text" class="text-xs font-bold text-brand-blue">0%</span>
+        </div>
+
+        <!-- ================= PAGE 1: BERANDA ================= -->
+        <section id="page-beranda" class="page-content space-y-6">
+            <div class="bg-gradient-to-br from-teal-400 to-emerald-500 text-white rounded-3xl p-6 md:p-8 card-shadow text-center relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-20 text-9xl">🦋</div>
+                <span class="bg-yellow-300 text-brand-dark font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">IPAS SD Kelas 3</span>
+                <h2 class="text-3xl md:text-5xl font-bold mt-2 mb-4 drop-shadow">Petualangan Siklus Hidup Satwa! 🌿</h2>
+                <p class="text-base md:text-lg max-w-2xl mx-auto opacity-95 mb-6 font-medium">
+                    Halo Peneliti Cilik! Mari jelajahi bagaimana hewan tumbuh dan berubah bentuk dari bayi hingga dewasa. Siap mengumpulkan semua lencana penghargaan?
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="navigateTo('materi')" class="bg-brand-yellow text-brand-dark hover:bg-yellow-300 font-bold px-6 py-3 rounded-2xl text-lg card-shadow-sm btn-bounce flex items-center space-x-2">
+                        <span>🚀 Mulai Belajar</span>
+                    </button>
+                    <button onclick="navigateTo('simulasi')" class="bg-white text-emerald-700 hover:bg-emerald-50 font-bold px-6 py-3 rounded-2xl text-lg card-shadow-sm btn-bounce flex items-center space-x-2">
+                        <span>🔬 Coba Simulasi</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TUJUAN PEMBELAJARAN CARD -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-5 rounded-2xl border-2 border-sky-200 card-shadow-sm">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="bg-sky-100 p-2.5 rounded-xl text-sky-600 text-2xl">🎯</div>
+                        <h3 class="text-lg font-bold text-sky-800">Tujuan Pembelajaran</h3>
+                    </div>
+                    <ul class="text-sm space-y-2 text-gray-700 list-disc list-inside">
+                        <li>Mengidentifikasi hewan yang mengalami <b>metamorfosis</b>.</li>
+                        <li>Membedakan metamorfosis <b>sempurna</b> dan <b>tidak sempurna</b>.</li>
+                        <li>Mengidentifikasi hewan yang tumbuh <b>tanpa metamorfosis</b>.</li>
+                        <li>Menganalisis hubungan kondisi lingkungan dengan siklus hidup.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-2 border-purple-200 card-shadow-sm">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="bg-purple-100 p-2.5 rounded-xl text-purple-600 text-2xl">🗺️</div>
+                        <h3 class="text-lg font-bold text-purple-800">Cara Bermain</h3>
+                    </div>
+                    <ol class="text-sm space-y-1.5 text-gray-700 list-decimal list-inside">
+                        <li>Baca <b>Materi</b> singkat dan menarik.</li>
+                        <li>Eksperimen di laboratorium <b>Simulasi</b>.</li>
+                        <li>Selesaikan <b>Permainan & Tantangan Cepat</b>.</li>
+                        <li>Uji kemampuanmu pada <b>Kuis Utama</b>.</li>
+                        <li>Dapatkan Skor 100 & kumpulkan semua <b>Badge</b>!</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 2: MATERI ================= -->
+        <section id="page-materi" class="page-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border-2 border-emerald-300 card-shadow">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="text-3xl">📚</span>
+                    <div>
+                        <h2 class="text-2xl font-bold text-emerald-800">Apa Itu Siklus Hidup Hewan?</h2>
+                        <p class="text-xs text-gray-500">Tahapan pertumbuhan hewan dari lahir hingga dewasa</p>
+                    </div>
+                </div>
+                <p class="text-gray-700 text-sm md:text-base leading-relaxed mb-4">
+                    Semua hewan mengalami <b>siklus hidup</b> (daur hidup). Namun, tidak semua hewan tumbuh dengan cara yang sama! Ada hewan yang bentuk tubuhnya berubah drastis saat tumbuh, dan ada yang bentuknya tetap sama hanya bertambah besar.
+                </p>
+
+                <!-- TABBED MATERI CONTENT -->
+                <div class="flex border-b border-gray-200 mb-4 gap-2 overflow-x-auto">
+                    <button onclick="switchMateriTab('sempurna')" id="tab-btn-sempurna" class="materi-tab-btn py-2 px-4 rounded-t-xl font-bold text-sm bg-emerald-500 text-white">
+                        🦋 Metamorfosis Sempurna
+                    </button>
+                    <button onclick="switchMateriTab('tidak-sempurna')" id="tab-btn-tidak-sempurna" class="materi-tab-btn py-2 px-4 rounded-t-xl font-bold text-sm bg-gray-200 text-gray-600 hover:bg-gray-300">
+                        🦗 Metamorfosis Tidak Sempurna
+                    </button>
+                    <button onclick="switchMateriTab('tanpa')" id="tab-btn-tanpa" class="materi-tab-btn py-2 px-4 rounded-t-xl font-bold text-sm bg-gray-200 text-gray-600 hover:bg-gray-300">
+                        🐱 Tanpa Metamorfosis
+                    </button>
+                </div>
+
+                <!-- TAB 1: METAMORFOSIS SEMPURNA -->
+                <div id="materi-tab-sempurna" class="materi-tab-content space-y-4">
+                    <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200">
+                        <h3 class="font-bold text-emerald-900 text-base mb-2">Perubahan Bentuk Sangat Berbeda (4 Tahap)</h3>
+                        <p class="text-sm text-gray-700 mb-3">
+                            Hewan mengalami bentuk tubuh yang <b>sangat berbeda</b> pada setiap tahapannya, termasuk melewati tahap kepompong (pupa).
+                        </p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+                            <div class="bg-white p-3 rounded-xl border border-emerald-200">
+                                <div class="text-2xl">🥚</div>
+                                <div class="font-bold text-xs text-emerald-800">1. Telur</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-emerald-200">
+                                <div class="text-2xl">🐛</div>
+                                <div class="font-bold text-xs text-emerald-800">2. Ulat (Larva)</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-emerald-200">
+                                <div class="text-2xl">🥜</div>
+                                <div class="font-bold text-xs text-emerald-800">3. Kepompong (Pupa)</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-emerald-200">
+                                <div class="text-2xl">🦋</div>
+                                <div class="font-bold text-xs text-emerald-800">4. Kupu-Kupu Dewasa</div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-emerald-800 mt-3 font-semibold">
+                            💡 Contoh lain: Katak (Telur ➔ Kecebong ➔ Katak Muda ➔ Katak Dewasa), Nyamuk, Lalat.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- TAB 2: METAMORFOSIS TIDAK SEMPURNA -->
+                <div id="materi-tab-tidak-sempurna" class="materi-tab-content hidden space-y-4">
+                    <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200">
+                        <h3 class="font-bold text-amber-900 text-base mb-2">Bentuk Bayi Mirip Dewasa Tanpa Kepompong (3 Tahap)</h3>
+                        <p class="text-sm text-gray-700 mb-3">
+                            Hewan muda (nimfa) tampak mirip dengan hewan dewasa, hanya ukurannya lebih kecil dan belum memiliki sayap sempurna. Tidak ada tahap kepompong!
+                        </p>
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-white p-3 rounded-xl border border-amber-200">
+                                <div class="text-2xl">🥚</div>
+                                <div class="font-bold text-xs text-amber-800">1. Telur</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-amber-200">
+                                <div class="text-2xl">🦗</div>
+                                <div class="font-bold text-xs text-amber-800">2. Nimfa (Muda)</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-amber-200">
+                                <div class="text-2xl">🦗✨</div>
+                                <div class="font-bold text-xs text-amber-800">3. Belalang Dewasa</div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-amber-800 mt-3 font-semibold">
+                            💡 Contoh lain: Kecoa, Capung, Jangkrik.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- TAB 3: TANPA METAMORFOSIS -->
+                <div id="materi-tab-tanpa" class="materi-tab-content hidden space-y-4">
+                    <div class="p-4 bg-sky-50 rounded-2xl border border-sky-200">
+                        <h3 class="font-bold text-sky-900 text-base mb-2">Bentuk Tubuh Sama, Hanya Bertambah Besar</h3>
+                        <p class="text-sm text-gray-700 mb-3">
+                            Hewan ini tidak mengalami perubahan bentuk tubuh. Anak hewan yang baru lahir atau menetas memiliki bentuk yang sama persis seperti induknya.
+                        </p>
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-white p-3 rounded-xl border border-sky-200">
+                                <div class="text-2xl">🐱</div>
+                                <div class="font-bold text-xs text-sky-800">1. Anak Kucing</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-sky-200">
+                                <div class="text-2xl">🐈</div>
+                                <div class="font-bold text-xs text-sky-800">2. Kucing Muda</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-sky-200">
+                                <div class="text-2xl">🐈‍⬛</div>
+                                <div class="font-bold text-xs text-sky-800">3. Kucing Dewasa</div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-sky-800 mt-3 font-semibold">
+                            💡 Contoh lain: Ayam, Sapi, Anjing, Burung, Manusia.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button onclick="navigateTo('simulasi')" class="bg-brand-green text-white font-bold px-5 py-2.5 rounded-xl text-sm card-shadow-sm btn-bounce flex items-center space-x-2">
+                        <span>Lanjut ke Simulasi</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 3: SIMULASI ================= -->
+        <section id="page-simulasi" class="page-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border-2 border-sky-300 card-shadow">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="text-3xl">🔬</span>
+                    <div>
+                        <h2 class="text-2xl font-bold text-sky-900">Laboratorium Siklus Hidup</h2>
+                        <p class="text-xs text-gray-500">Ubah kondisi lingkungan dan amati dampak sebab-akibatnya!</p>
+                    </div>
+                </div>
+
+                <!-- Control Panel & Display -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Controls -->
+                    <div class="bg-sky-50 p-4 rounded-2xl border border-sky-200 space-y-4">
+                        <h3 class="font-bold text-sky-800 border-b border-sky-200 pb-2">⚙️ Pengaturan Hewan & Lingkungan</h3>
+
+                        <!-- Select Animal -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Pilih Hewan:</label>
+                            <select id="sim-animal-select" onchange="updateSimulation()" class="w-full bg-white border border-sky-300 rounded-xl p-2 text-sm font-bold text-sky-900">
+                                <option value="kupu">🦋 Kupu-Kupu (Metamorfosis Sempurna)</option>
+                                <option value="katak">🐸 Katak (Metamorfosis Sempurna)</option>
+                                <option value="belalang">🦗 Belalang (Metamorfosis Tidak Sempurna)</option>
+                                <option value="ayam">🐔 Ayam (Tanpa Metamorfosis)</option>
+                            </select>
+                        </div>
+
+                        <!-- Slider: Suhu Lingkungan -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span>🌡️ Suhu Lingkungan:</span>
+                                <span id="sim-temp-val" class="text-sky-700">25°C (Normal)</span>
+                            </div>
+                            <input type="range" id="sim-temp-slider" min="10" max="40" value="25" oninput="updateSimulation()" class="w-full accent-sky-600">
+                            <div class="flex justify-between text-[10px] text-gray-500 mt-0.5">
+                                <span>Dingin (10°C)</span>
+                                <span>Panas (40°C)</span>
+                            </div>
+                        </div>
+
+                        <!-- Select: Makanan -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">🍎 Ketersediaan Makanan:</label>
+                            <select id="sim-food-select" onchange="updateSimulation()" class="w-full bg-white border border-sky-300 rounded-xl p-2 text-sm font-bold text-sky-900">
+                                <option value="banyak">Cukup & Melimpah 🥬</option>
+                                <option value="sedikit">Sangat Langka / Langka 🍂</option>
+                            </select>
+                        </div>
+
+                        <!-- Stage Selector Buttons -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Pilih Tahapan Hidup:</label>
+                            <div id="sim-stage-buttons" class="grid grid-cols-2 gap-2">
+                                <!-- Dynamic stage buttons loaded via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Stage Canvas Display -->
+                    <div class="md:col-span-2 bg-gradient-to-b from-sky-100 to-emerald-50 rounded-2xl border-2 border-sky-300 p-6 flex flex-col justify-between min-h-[320px] relative overflow-hidden">
+                        
+                        <!-- Environment Indicator Badges -->
+                        <div class="flex justify-between items-center z-10">
+                            <span id="sim-type-badge" class="bg-brand-purple text-white text-xs px-3 py-1 rounded-full font-bold">
+                                Metamorfosis Sempurna
+                            </span>
+                            <span id="sim-status-badge" class="bg-emerald-500 text-white text-xs px-3 py-1 rounded-full font-bold">
+                                Kondisi Sehat ✨
+                            </span>
+                        </div>
+
+                        <!-- Graphic Animation Center -->
+                        <div class="my-6 text-center z-10">
+                            <div id="sim-graphic-icon" class="text-8xl animate-float inline-block filter drop-shadow-md transition-all duration-300">
+                                🥚
+                            </div>
+                            <h3 id="sim-stage-title" class="text-xl font-bold text-sky-900 mt-2">Tahap 1: Telur</h3>
+                            <p id="sim-stage-desc" class="text-xs md:text-sm text-gray-600 max-w-md mx-auto mt-1">
+                                Telur diletakkan di daun oleh induk kupu-kupu.
+                            </p>
+                        </div>
+
+                        <!-- Cause and Effect Info Box -->
+                        <div class="bg-white/90 backdrop-blur p-3.5 rounded-xl border border-sky-200 z-10">
+                            <h4 class="text-xs font-bold text-sky-800 flex items-center space-x-1">
+                                <span>💡 Hasil Pengamatan Sebab-Akibat:</span>
+                            </h4>
+                            <p id="sim-cause-effect-text" class="text-xs text-gray-700 mt-1 font-medium">
+                                Lingkungan sangat ideal! Pertumbuhan berlangsung normal dan sehat.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 4: PERMAINAN (ACTIVITIES) ================= -->
+        <section id="page-permainan" class="page-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border-2 border-brand-yellow card-shadow">
+                <div class="flex items-center space-x-3 mb-6">
+                    <span class="text-3xl">🎮</span>
+                    <div>
+                        <h2 class="text-2xl font-bold text-amber-900">Pusat Permainan Edukasi</h2>
+                        <p class="text-xs text-gray-500">Pilih wahana permainan untuk menguji pengetahuanmu!</p>
+                    </div>
+                </div>
+
+                <!-- GAME MENU TABS -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                    <button onclick="openGameTab('openthebox')" id="btn-game-openthebox" class="game-selector-btn p-3 rounded-2xl border-2 border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-900 font-bold text-xs md:text-sm flex flex-col items-center gap-1 transition">
+                        <span class="text-2xl">🎁</span>
+                        <span>Open the Box</span>
+                    </button>
+                    <button onclick="openGameTab('dragdrop')" id="btn-game-dragdrop" class="game-selector-btn p-3 rounded-2xl border-2 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold text-xs md:text-sm flex flex-col items-center gap-1 transition">
+                        <span class="text-2xl">🧩</span>
+                        <span>Urutkan Siklus</span>
+                    </button>
+                    <button onclick="openGameTab('match')" id="btn-game-match" class="game-selector-btn p-3 rounded-2xl border-2 border-sky-300 bg-sky-50 hover:bg-sky-100 text-sky-900 font-bold text-xs md:text-sm flex flex-col items-center gap-1 transition">
+                        <span class="text-2xl">🔗</span>
+                        <span>Menjodohkan</span>
+                    </button>
+                    <button onclick="openGameTab('fillblank')" id="btn-game-fillblank" class="game-selector-btn p-3 rounded-2xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-xs md:text-sm flex flex-col items-center gap-1 transition">
+                        <span class="text-2xl">✏️</span>
+                        <span>Isi Kata Rumpang</span>
+                    </button>
+                    <button onclick="openGameTab('truefalse')" id="btn-game-truefalse" class="game-selector-btn p-3 rounded-2xl border-2 border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-900 font-bold text-xs md:text-sm flex flex-col items-center gap-1 transition">
+                        <span class="text-2xl">👍👎</span>
+                        <span>Benar atau Salah</span>
+                    </button>
+                    <button onclick="openGameTab('timerchallenge')" id="btn-game-timerchallenge" class="game-selector-btn p-3 rounded-2xl border-2 border-red-400 bg-red-50 hover:bg-red-100 text-red-900 font-bold text-xs md:text-sm flex flex-col items-center gap-1 transition col-span-2 md:col-span-1">
+                        <span class="text-2xl">⚡</span>
+                        <span>Tantangan Cepat!</span>
+                    </button>
+                </div>
+
+                <!-- GAME CONTAINER BOX -->
+                <div class="bg-gray-50 p-4 md:p-6 rounded-2xl border border-gray-200 min-h-[380px]">
+
+                    <!-- 1. OPEN THE BOX GAME -->
+                    <div id="game-openthebox" class="game-tab-content space-y-4">
+                        <div class="text-center mb-4">
+                            <span class="bg-purple-200 text-purple-800 text-xs px-3 py-1 rounded-full font-bold">Level 1: Mudah</span>
+                            <h3 class="text-lg font-bold text-purple-900 mt-1">🎁 Open the Box - Rahasia Hewan</h3>
+                            <p class="text-xs text-gray-600">Buka kotak untuk menemukan pertanyaan dan pilih jawaban yang tepat!</p>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3" id="otb-grid">
+                            <!-- Dynamically generated 5 boxes -->
+                        </div>
+                        <div id="otb-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                            <div class="bg-white rounded-3xl p-6 max-w-md w-full border-4 border-purple-300 card-shadow text-center space-y-4">
+                                <span class="text-4xl" id="otb-modal-icon">🎁</span>
+                                <h4 class="text-base font-bold text-purple-900" id="otb-modal-question">Pertanyaan Kotak</h4>
+                                <div class="grid grid-cols-1 gap-2" id="otb-modal-options"></div>
+                                <div id="otb-feedback" class="text-xs p-2.5 rounded-xl hidden"></div>
+                                <button onclick="closeOtbModal()" class="bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-xl text-xs">Tutup</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. DRAG AND DROP (ORDERING) -->
+                    <div id="game-dragdrop" class="game-tab-content hidden space-y-4">
+                        <div class="text-center mb-2">
+                            <span class="bg-emerald-200 text-emerald-800 text-xs px-3 py-1 rounded-full font-bold">Level 2: Sedang</span>
+                            <h3 class="text-lg font-bold text-emerald-900 mt-1">🧩 Urutkan Daur Hidup Kupu-Kupu</h3>
+                            <p class="text-xs text-gray-600">Tarik gambar ke urutan yang benar (Atau klik ikon lalu klik kotak tujuan)!</p>
+                        </div>
+
+                        <!-- Source Items -->
+                        <div class="bg-white p-3 rounded-xl border border-emerald-200 flex flex-wrap justify-center gap-3" id="dnd-source">
+                            <!-- Items inserted by JS -->
+                        </div>
+
+                        <!-- Target Drop Slots -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="dnd-targets">
+                            <!-- Target slots 1..4 -->
+                        </div>
+
+                        <div class="flex justify-center space-x-3 mt-4">
+                            <button onclick="checkDndResult()" class="bg-brand-green text-white font-bold px-5 py-2 rounded-xl text-xs card-shadow-sm btn-bounce">Periksa Jawaban</button>
+                            <button onclick="resetDndGame()" class="bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-xl text-xs">Reset</button>
+                        </div>
+                        <div id="dnd-feedback" class="text-xs text-center p-2 rounded-xl hidden font-bold"></div>
+                    </div>
+
+                    <!-- 3. MATCHING GAME -->
+                    <div id="game-match" class="game-tab-content hidden space-y-4">
+                        <div class="text-center mb-2">
+                            <span class="bg-sky-200 text-sky-800 text-xs px-3 py-1 rounded-full font-bold">Level 2: Sedang</span>
+                            <h3 class="text-lg font-bold text-sky-900 mt-1">🔗 Pasangkan Hewan & Tipe Metamorfosisnya</h3>
+                            <p class="text-xs text-gray-600">Klik satu nama hewan di sebelah kiri, lalu klik tipe metamorfosis yang pas di sebelah kanan!</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Left Column: Animals -->
+                            <div class="space-y-2" id="match-left-col"></div>
+                            <!-- Right Column: Types -->
+                            <div class="space-y-2" id="match-right-col"></div>
+                        </div>
+
+                        <div class="flex justify-center space-x-3 mt-4">
+                            <button onclick="resetMatchGame()" class="bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-xl text-xs">Reset Pasangan</button>
+                        </div>
+                        <div id="match-feedback" class="text-xs text-center p-2 rounded-xl hidden font-bold"></div>
+                    </div>
+
+                    <!-- 4. FILL IN THE BLANK GAME -->
+                    <div id="game-fillblank" class="game-tab-content hidden space-y-4">
+                        <div class="text-center mb-2">
+                            <span class="bg-amber-200 text-amber-800 text-xs px-3 py-1 rounded-full font-bold">Level 2: Sedang</span>
+                            <h3 class="text-lg font-bold text-amber-900 mt-1">✏️ Lengkapi Kalimat Sains Rumpang</h3>
+                            <p class="text-xs text-gray-600">Pilih kata yang tepat dari kotak pilihan untuk mengisi bagian kosong!</p>
+                        </div>
+
+                        <!-- Questions Container -->
+                        <div class="space-y-3" id="fillblank-questions-container">
+                            <!-- Dynamic questions with selects inserted here -->
+                        </div>
+
+                        <div class="flex justify-center space-x-3 mt-4">
+                            <button onclick="checkFillBlankResults()" class="bg-brand-yellow text-brand-dark font-bold px-5 py-2 rounded-xl text-xs card-shadow-sm btn-bounce">Periksa Jawaban</button>
+                        </div>
+                        <div id="fillblank-feedback" class="text-xs text-center p-2 rounded-xl hidden font-bold"></div>
+                    </div>
+
+                    <!-- 5. TRUE OR FALSE GAME -->
+                    <div id="game-truefalse" class="game-tab-content hidden space-y-4">
+                        <div class="text-center mb-2">
+                            <span class="bg-rose-200 text-rose-800 text-xs px-3 py-1 rounded-full font-bold">Level 1: Mudah</span>
+                            <h3 class="text-lg font-bold text-rose-900 mt-1">👍👎 Benar atau Salah?</h3>
+                            <p class="text-xs text-gray-600">Tentukan apakah pernyataan sains berikut ini Benar atau Salah!</p>
+                        </div>
+
+                        <div class="space-y-3" id="tf-questions-container">
+                            <!-- Dynamic TF questions inserted here -->
+                        </div>
+
+                        <div id="tf-feedback" class="text-xs text-center p-2 rounded-xl hidden font-bold"></div>
+                    </div>
+
+                    <!-- 6. TIMER CHALLENGE (TANTANGAN CEPAT) -->
+                    <div id="game-timerchallenge" class="game-tab-content hidden space-y-4">
+                        <div class="text-center mb-2">
+                            <span class="bg-red-200 text-red-800 text-xs px-3 py-1 rounded-full font-bold">Level 3: Menantang! 🔥</span>
+                            <h3 class="text-lg font-bold text-red-900 mt-1">⚡ Tantangan Cepat (Time Attack)</h3>
+                            <p class="text-xs text-gray-600">Jawab sebanyak mungkin sebelum waktu 30 detik habis!</p>
+                        </div>
+
+                        <div id="tc-start-screen" class="text-center py-8 space-y-4">
+                            <div class="text-6xl animate-bounce">⏱️</div>
+                            <button onclick="startTimerChallenge()" class="bg-brand-red text-white font-bold text-base px-6 py-3 rounded-2xl card-shadow btn-bounce">
+                                🚀 Mulai Tantangan Cepat!
+                            </button>
+                        </div>
+
+                        <div id="tc-play-screen" class="hidden space-y-4">
+                            <!-- Timer & Score bar -->
+                            <div class="flex justify-between items-center bg-red-100 p-3 rounded-xl border border-red-300">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xl">⏱️</span>
+                                    <span id="tc-timer" class="text-2xl font-bold text-red-700">30</span>
+                                    <span class="text-xs text-red-600 font-bold">Detik</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-gray-600 block">Benar Berturut:</span>
+                                    <span id="tc-streak" class="text-lg font-bold text-amber-600">0 🔥</span>
+                                </div>
+                            </div>
+
+                            <!-- Question Card -->
+                            <div class="bg-white p-4 rounded-2xl border-2 border-red-200 text-center space-y-3">
+                                <h4 id="tc-question-text" class="font-bold text-sm md:text-base text-gray-800">Soal muncul di sini...</h4>
+                                <div id="tc-options" class="grid grid-cols-2 gap-2"></div>
+                            </div>
+                        </div>
+
+                        <div id="tc-result-screen" class="hidden text-center py-6 space-y-3">
+                            <div class="text-5xl">🏆</div>
+                            <h4 class="text-lg font-bold text-gray-800">Waktu Habis!</h4>
+                            <p id="tc-final-score" class="text-sm font-bold text-brand-blue">Kamu berhasil menjawab 0 soal dengan benar!</p>
+                            <button onclick="startTimerChallenge()" class="bg-brand-red text-white font-bold px-4 py-2 rounded-xl text-xs">Coba Lagi 🔄</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 5: KUIS UTAMA ================= -->
+        <section id="page-kuis" class="page-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border-2 border-brand-purple card-shadow">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">📝</span>
+                        <div>
+                            <h2 class="text-2xl font-bold text-purple-900">Kuis Evaluasi Siklus Hidup</h2>
+                            <p class="text-xs text-gray-500">Jawab 5 soal pilihan ganda untuk menguji pemahamanmu!</p>
+                        </div>
+                    </div>
+                    <span id="quiz-progress-badge" class="bg-purple-100 text-purple-800 text-xs font-bold px-3 py-1 rounded-full">
+                        Soal 1 / 5
+                    </span>
+                </div>
+
+                <!-- Quiz Box -->
+                <div class="bg-purple-50 p-5 rounded-2xl border border-purple-200 space-y-4">
+                    <h3 id="quiz-question-title" class="font-bold text-base md:text-lg text-purple-950">
+                         Loading soal...
+                    </h3>
+
+                    <!-- Options list -->
+                    <div id="quiz-options-container" class="grid grid-cols-1 gap-2.5">
+                        <!-- Dynamic options loaded here -->
+                    </div>
+
+                    <!-- Direct Feedback & Explanation Box -->
+                    <div id="quiz-explanation-box" class="hidden p-4 rounded-xl border text-xs space-y-1">
+                        <div class="font-bold text-sm" id="quiz-feedback-title"></div>
+                        <p id="quiz-explanation-text" class="text-gray-700"></p>
+                    </div>
+
+                    <!-- Quiz Navigation Buttons -->
+                    <div class="flex justify-between items-center pt-2">
+                        <button id="quiz-prev-btn" onclick="prevQuizQuestion()" class="bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-xl text-xs disabled:opacity-50">
+                            ⬅️ Sebelumnya
+                        </button>
+                        <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="bg-brand-purple text-white font-bold px-5 py-2 rounded-xl text-xs card-shadow-sm btn-bounce">
+                            Lanjut ➡️
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 6: HASIL & PENCHARGAAN ================= -->
+        <section id="page-hasil" class="page-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-3xl border-2 border-emerald-400 card-shadow text-center space-y-6">
+                <div class="space-y-2">
+                    <span class="text-5xl animate-bounce inline-block">🏆</span>
+                    <h2 class="text-3xl font-bold text-emerald-800">Rapor & Badges Peneliti Cilik</h2>
+                    <p class="text-xs text-gray-500">Inilah hasil perjalanan belajar interaktifmu!</p>
+                </div>
+
+                <!-- Total Score Summary Card -->
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6 rounded-2xl card-shadow-sm max-w-md mx-auto space-y-2">
+                    <span class="text-xs uppercase tracking-wider font-bold text-emerald-100">Total Skor Pengalaman</span>
+                    <div class="text-5xl font-bold text-brand-yellow" id="final-score-display">0</div>
+                    <p id="motivation-message" class="text-sm font-semibold text-emerald-50 italic">
+                        "Teruslah belajar dan menjelajahi keajaiban alam!"
+                    </p>
+                </div>
+
+                <!-- Badges Grid -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-gray-800 text-base text-left">🎖️ Koleksi Lencana (Badges) Anda:</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="badges-container">
+                        <!-- Badges dynamically rendered here -->
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="pt-4 flex flex-wrap justify-center gap-3">
+                    <button onclick="resetAllProgress()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-5 py-2.5 rounded-xl text-xs flex items-center space-x-1">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Ulangi Semua Aktivitas</span>
+                    </button>
+                    <button onclick="navigateTo('beranda')" class="bg-brand-green text-white font-bold px-6 py-2.5 rounded-xl text-xs card-shadow-sm btn-bounce">
+                        Kembali ke Beranda 🏠
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t-2 border-emerald-200 py-3 text-center text-xs text-gray-500">
+        <p>© 2026 Media Pembelajaran Interaktif SD Kelas 3 - Daur Hidup Hewan & Metamorfosis 🌿</p>
+    </footer>
+
+    <!-- JAVASCRIPT GAME & INTERACTIVE LOGIC -->
+    <script>
+        /* ================= STATE MANAGEMENT ================= */
+        const state = {
+            score: 0,
+            completedActivities: new Set(),
+            selectedDndItem: null,
+            selectedMatchLeft: null,
+            quizIndex: 0,
+            quizAnswers: {},
+            timerChallenge: {
+                timer: 30,
+                interval: null,
+                streak: 0,
+                score: 0
+            }
+        };
+
+        /* ================= AUDIO FX (Tone.js) ================= */
+        const playSound = (type) => {
+            try {
+                if (Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+                const synth = new Tone.Synth().toDestination();
+                if (type === 'correct') {
+                    synth.triggerAttackRelease("C5", "8n");
+                    setTimeout(() => synth.triggerAttackRelease("G5", "8n"), 100);
+                } else if (type === 'wrong') {
+                    synth.triggerAttackRelease("G2", "8n");
+                } else if (type === 'click') {
+                    synth.triggerAttackRelease("E4", "16n");
+                } else if (type === 'win') {
+                    synth.triggerAttackRelease("C4", "8n");
+                    setTimeout(() => synth.triggerAttackRelease("E4", "8n"), 120);
+                    setTimeout(() => synth.triggerAttackRelease("G4", "8n"), 240);
+                    setTimeout(() => synth.triggerAttackRelease("C5", "4n"), 360);
+                }
+            } catch (e) {
+                // Audio fallback if muted/blocked
+            }
+        };
+
+        /* ================= NAVIGATION SYSTEM ================= */
+        function navigateTo(pageId) {
+            playSound('click');
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) targetPage.classList.remove('hidden');
+
+            // Update Nav Active State
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('border-brand-yellow', 'bg-emerald-700');
+                btn.classList.add('border-transparent');
+            });
+            const activeNav = document.getElementById(`nav-${pageId}`);
+            if (activeNav) {
+                activeNav.classList.remove('border-transparent');
+                activeNav.classList.add('border-brand-yellow', 'bg-emerald-700');
+            }
+
+            // Page initialization hooks
+            if (pageId === 'simulasi') initSimulation();
+            if (pageId === 'permainan') openGameTab('openthebox');
+            if (pageId === 'kuis') loadQuizQuestion();
+            if (pageId === 'hasil') renderBadgesAndResults();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ================= GAMIFICATION & BADGES SYSTEM ================= */
+        const BADGES_LIST = [
+            { id: 'b_materi', title: 'Penjelajah Sains', icon: '📖', desc: 'Membaca materi pelajaran' },
+            { id: 'b_otb', title: 'Detektif Kotak', icon: '🎁', desc: 'Menyelesaikan Open the Box' },
+            { id: 'b_dnd', title: 'Master Daur Hidup', icon: '🧩', desc: 'Menyusun urutan metamorfosis' },
+            { id: 'b_match', title: 'Pencocok Ulung', icon: '🔗', desc: 'Menjodohkan tipe metamorfosis' },
+            { id: 'b_fill', title: 'Ahli Kata Sains', icon: '✏️', desc: 'Melengkapi teks rumpang' },
+            { id: 'b_tf', title: 'Penguji Fakta', icon: '👍', desc: 'Menjawab soal Benar/Salah' },
+            { id: 'b_tc', title: 'Kilat Sains', icon: '⚡', desc: 'Menyelesaikan Tantangan Cepat' },
+            { id: 'b_quiz', title: 'Bintang Kuis', icon: '🌟', desc: 'Menyelesaikan Kuis Evaluasi' }
+        ];
+
+        function addScore(points, activityId) {
+            state.score += points;
+            if (activityId) state.completedActivities.add(activityId);
+            updateScoreAndProgressUI();
+        }
+
+        function updateScoreAndProgressUI() {
+            document.getElementById('global-score').textContent = state.score;
+            document.getElementById('final-score-display').textContent = state.score;
+
+            // Level Badges update
+            const levelElem = document.getElementById('user-level-badge');
+            if (state.score < 100) {
+                levelElem.textContent = "Pemula 🌿";
+            } else if (state.score < 250) {
+                levelElem.textContent = "Peneliti 🔬";
+            } else {
+                levelElem.textContent = "Master Satwa 👑";
+            }
+
+            // Calculate progress percentage (total 8 main activities)
+            const progressPct = Math.min(100, Math.round((state.completedActivities.size / BADGES_LIST.length) * 100));
+            document.getElementById('overall-progress').style.width = `${progressPct}%`;
+            document.getElementById('overall-progress-text').textContent = `${progressPct}%`;
+        }
+
+        function renderBadgesAndResults() {
+            const container = document.getElementById('badges-container');
+            container.innerHTML = '';
+
+            BADGES_LIST.forEach(b => {
+                const isUnlocked = state.completedActivities.has(b.id);
+                const badgeEl = document.createElement('div');
+                badgeEl.className = `p-3 rounded-2xl border-2 text-center transition-all ${
+                    isUnlocked ? 'bg-amber-50 border-amber-300 card-shadow-sm' : 'bg-gray-100 border-gray-200 opacity-50 grayscale'
+                }`;
+                badgeEl.innerHTML = `
+                    <div class="text-3xl mb-1">${b.icon}</div>
+                    <h4 class="font-bold text-xs text-gray-800">${b.title}</h4>
+                    <p class="text-[10px] text-gray-500 mt-0.5">${b.desc}</p>
+                    <span class="inline-block mt-2 text-[9px] font-bold px-2 py-0.5 rounded-full ${isUnlocked ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-600'}">
+                        ${isUnlocked ? 'Tercapai ✨' : 'Terkunci 🔒'}
+                    </span>
+                `;
+                container.appendChild(badgeEl);
+            });
+
+            // Motivation Message
+            const msgEl = document.getElementById('motivation-message');
+            if (state.score >= 300) {
+                msgEl.textContent = "🎉 LUAR BIASA! Kamu adalah Master Siklus Hidup Satwa Sejati!";
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else if (state.score >= 150) {
+                msgEl.textContent = "👍 HEBAT! Pemahamanmu tentang hewan sudah sangat bagus!";
+            } else {
+                msgEl.textContent = "💪 AYO SEMANGAT! Jelajahi permainan lagi untuk meningkatkan skormu!";
+            }
+        }
+
+        function resetAllProgress() {
+            state.score = 0;
+            state.completedActivities.clear();
+            updateScoreAndProgressUI();
+            navigateTo('beranda');
+        }
+
+        /* ================= MATERI TAB SWITCHER ================= */
+        function switchMateriTab(tabName) {
+            playSound('click');
+            state.completedActivities.add('b_materi');
+            updateScoreAndProgressUI();
+
+            document.querySelectorAll('.materi-tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.materi-tab-btn').forEach(b => {
+                b.classList.remove('bg-emerald-500', 'text-white');
+                b.classList.add('bg-gray-200', 'text-gray-600');
+            });
+
+            document.getElementById(`materi-tab-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            activeBtn.classList.remove('bg-gray-200', 'text-gray-600');
+            activeBtn.classList.add('bg-emerald-500', 'text-white');
+        }
+
+        /* ================= SIMULATION LAB LOGIC ================= */
+        const SIM_DATA = {
+            kupu: {
+                name: "Kupu-Kupu",
+                type: "Metamorfosis Sempurna",
+                stages: [
+                    { name: "Telur", icon: "🥚", desc: "Diletakkan induk di atas daun muda." },
+                    { name: "Ulat (Larva)", icon: "🐛", desc: "Sangat aktif makan daun untuk tumbuh." },
+                    { name: "Kepompong (Pupa)", icon: "🥜", desc: "Berpuasa dan mengubah bentuk tubuh." },
+                    { name: "Kupu-Kupu Dewasa", icon: "🦋", desc: "Punya sayap indah dan siap berkembang biak." }
+                ]
+            },
+            katak: {
+                name: "Katak",
+                type: "Metamorfosis Sempurna",
+                stages: [
+                    { name: "Telur", icon: "⚪", desc: "Diletakkan di dalam air berlendir." },
+                    { name: "Kecebong", icon: "🐟", desc: "Bernapas dengan insang dan berenang di air." },
+                    { name: "Katak Muda", icon: "🐸", desc: "Tumbuh kaki dan ekor mulai memendek." },
+                    { name: "Katak Dewasa", icon: "🐸✨", desc: "Bernapas dengan paru-paru dan kulit di darat/air." }
+                ]
+            },
+            belalang: {
+                name: "Belalang",
+                type: "Metamorfosis Tidak Sempurna",
+                stages: [
+                    { name: "Telur", icon: "🥚", desc: "Diletakkan di tanah atau tanaman." },
+                    { name: "Nimfa (Belalang Muda)", icon: "🦗", desc: "Bentuk mirip dewasa tapi belum punya sayap." },
+                    { name: "Belalang Dewasa", icon: "🦗✨", desc: "Sudah bersayap lengkap dan siap melompat jauh." }
+                ]
+            },
+            ayam: {
+                name: "Ayam",
+                type: "Tanpa Metamorfosis",
+                stages: [
+                    { name: "Telur", icon: "🥚", desc: "Dierami induknya selama 21 hari." },
+                    { name: "Anak Ayam", icon: "🐣", desc: "Bentuknya sama persis seperti ayam dewasa." },
+                    { name: "Ayam Dewasa", icon: "🐔", desc: "Tumbuh besar dan berkokok/bertelur." }
+                ]
+            }
+        };
+
+        let currentSimState = { animal: 'kupu', stageIdx: 0 };
+
+        function initSimulation() {
+            updateSimulation();
+        }
+
+        function updateSimulation() {
+            const animalKey = document.getElementById('sim-animal-select').value;
+            const tempVal = parseInt(document.getElementById('sim-temp-slider').value);
+            const foodVal = document.getElementById('sim-food-select').value;
+
+            document.getElementById('sim-temp-val').textContent = `${tempVal}°C (${tempVal < 18 ? 'Dingin' : tempVal > 32 ? 'Panas' : 'Normal'})`;
+
+            const animalData = SIM_DATA[animalKey];
+            if (currentSimState.animal !== animalKey) {
+                currentSimState.animal = animalKey;
+                currentSimState.stageIdx = 0;
+            }
+
+            // Render Stage Buttons
+            const stageBtnsBox = document.getElementById('sim-stage-buttons');
+            stageBtnsBox.innerHTML = '';
+            animalData.stages.forEach((st, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `py-1.5 px-2 rounded-xl text-xs font-bold transition border ${
+                    idx === currentSimState.stageIdx ? 'bg-sky-600 text-white border-sky-700' : 'bg-white text-gray-700 border-sky-200 hover:bg-sky-50'
+                }`;
+                btn.textContent = `${idx + 1}. ${st.name}`;
+                btn.onclick = () => { currentSimState.stageIdx = idx; updateSimulation(); playSound('click'); };
+                stageBtnsBox.appendChild(btn);
+            });
+
+            // Update Graphic & Stage Text
+            const curStage = animalData.stages[currentSimState.stageIdx];
+            document.getElementById('sim-type-badge').textContent = animalData.type;
+            document.getElementById('sim-graphic-icon').textContent = curStage.icon;
+            document.getElementById('sim-stage-title').textContent = `Tahap ${currentSimState.stageIdx + 1}: ${curStage.name}`;
+            document.getElementById('sim-stage-desc').textContent = curStage.desc;
+
+            // Calculate Cause and Effect logic
+            const statusBadge = document.getElementById('sim-status-badge');
+            const causeEffectText = document.getElementById('sim-cause-effect-text');
+
+            if (tempVal < 18) {
+                statusBadge.className = "bg-sky-500 text-white text-xs px-3 py-1 rounded-full font-bold";
+                statusBadge.textContent = "Suhu Dingin ❄️";
+                causeEffectText.textContent = "Suhu terlalu dingin membuat metabolisme lambat. Pertumbuhan daur hidup menjadi LEBIH LAMBAT dari biasanya!";
+            } else if (tempVal > 32) {
+                statusBadge.className = "bg-rose-500 text-white text-xs px-3 py-1 rounded-full font-bold";
+                statusBadge.textContent = "Suhu Panas 🔥";
+                causeEffectText.textContent = "Suhu terlalu panas dapat menyebabkan dehidrasi pada telur atau larva. Beberapa larva berisiko gagal tumbuh!";
+            } else if (foodVal === 'sedikit') {
+                statusBadge.className = "bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-bold";
+                statusBadge.textContent = "Makanan Sedikit 🍂";
+                causeEffectText.textContent = "Kekurangan makanan membuat ukuran larva/hewan muda lebih kecil dan masa kepompong/pertumbuhan terhambat.";
+            } else {
+                statusBadge.className = "bg-emerald-500 text-white text-xs px-3 py-1 rounded-full font-bold";
+                statusBadge.textContent = "Kondisi Ideal ✨";
+                causeEffectText.textContent = "Suhu hangat pas dan makanan melimpah! Daur hidup hewan berlangsung sangat sehat dan sempurna.";
+            }
+        }
+
+        /* ================= PERMAINAN / GAMES TABS ================= */
+        function openGameTab(gameKey) {
+            playSound('click');
+            document.querySelectorAll('.game-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.game-selector-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-brand-yellow'));
+
+            const targetTab = document.getElementById(`game-${gameKey}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`btn-game-${gameKey}`);
+            if (activeBtn) activeBtn.classList.add('ring-4', 'ring-brand-yellow');
+
+            // Init sub games
+            if (gameKey === 'openthebox') initOpenTheBox();
+            if (gameKey === 'dragdrop') resetDndGame();
+            if (gameKey === 'match') resetMatchGame();
+            if (gameKey === 'fillblank') initFillBlankGame();
+            if (gameKey === 'truefalse') initTrueFalseGame();
+        }
+
+        /* ----- GAME 1: OPEN THE BOX ----- */
+        const OTB_DATA = [
+            { id: 1, q: "Manakah hewan yang mengalami metamorfosis sempurna?", opts: ["🦋 Kupu-kupu", "🐔 Ayam", "🐱 Kucing"], ans: 0, exp: "Benar! Kupu-kupu mengalami 4 tahap termasuk pupa (kepompong)." },
+            { id: 2, q: "Hewan apa yang bertelur tetapi TIDAK mengalami metamorfosis?", opts: ["🦗 Belalang", "🦆 Bebek", "🐸 Katak"], ans: 1, exp: "Benar! Bebek bertelur tetapi anaknya langsung mirip induknya." },
+            { id: 3, q: "Apa nama tahap setelah telur pada metamorfosis kupu-kupu?", opts: ["Kepompong", "Ulat (Larva)", "Kupu-Kupu Muda"], ans: 1, exp: "Tepat! Telur menetas menjadi Ulat/Larva yang lapar." },
+            { id: 4, q: "Manakah ciri utama metamorfosis TIDAK sempurna?", opts: ["Melewati tahap kepompong", "Bentuk bayi sangat beda", "Tidak ada tahap kepompong"], ans: 2, exp: "Hebat! Metamorfosis tidak sempurna tidak punya tahap kepompong." },
+            { id: 5, q: "Anak katak yang baru menetas dari telur dan berenang di air disebut...", opts: ["Kecebong", "Ulat", "Nimfa"], ans: 0, exp: "Pintar! Kecebong bernapas dengan insang di air." }
+        ];
+
+        let otbOpened = {};
+
+        function initOpenTheBox() {
+            const grid = document.getElementById('otb-grid');
+            grid.innerHTML = '';
+            OTB_DATA.forEach((item, idx) => {
+                const box = document.createElement('div');
+                const isOpened = otbOpened[item.id];
+                box.className = `p-4 rounded-2xl border-2 cursor-pointer text-center font-bold transition card-shadow-sm flex flex-col items-center justify-center min-h-[100px] ${
+                    isOpened ? 'bg-gray-200 border-gray-300 text-gray-500' : 'bg-gradient-to-b from-purple-400 to-purple-600 border-purple-300 text-white hover:scale-105'
+                }`;
+                box.innerHTML = `
+                    <div class="text-3xl">${isOpened ? '🔓' : '🎁'}</div>
+                    <div class="text-xs mt-1">Kotak ${idx + 1}</div>
+                `;
+                box.onclick = () => openOtbModal(item);
+                grid.appendChild(box);
+            });
+        }
+
+        function openOtbModal(item) {
+            playSound('click');
+            const modal = document.getElementById('otb-modal');
+            modal.classList.remove('hidden');
+            document.getElementById('otb-modal-question').textContent = item.q;
+            document.getElementById('otb-feedback').className = "text-xs p-2.5 rounded-xl hidden";
+
+            const optsBox = document.getElementById('otb-modal-options');
+            optsBox.innerHTML = '';
+            item.opts.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold p-2.5 rounded-xl text-xs text-left border border-purple-300";
+                btn.textContent = opt;
+                btn.onclick = () => {
+                    const fb = document.getElementById('otb-feedback');
+                    fb.classList.remove('hidden');
+                    if (idx === item.ans) {
+                        playSound('correct');
+                        fb.className = "text-xs p-2.5 rounded-xl bg-emerald-100 text-emerald-800 font-bold border border-emerald-300";
+                        fb.textContent = `✨ ${item.exp}`;
+                        otbOpened[item.id] = true;
+                        addScore(20, 'b_otb');
+                        initOpenTheBox();
+                    } else {
+                        playSound('wrong');
+                        fb.className = "text-xs p-2.5 rounded-xl bg-rose-100 text-rose-800 font-bold border border-rose-300";
+                        fb.textContent = "❌ Kurang tepat, coba pilihan yang lain!";
+                    }
+                };
+                optsBox.appendChild(btn);
+            });
+        }
+
+        function closeOtbModal() {
+            document.getElementById('otb-modal').classList.add('hidden');
+        }
+
+        /* ----- GAME 2: DRAG AND DROP / CLICK-TO-SELECT ORDERING ----- */
+        const DND_ITEMS = [
+            { id: 'stg-1', name: '1. Telur', icon: '🥚', order: 1 },
+            { id: 'stg-2', name: '2. Ulat (Larva)', icon: '🐛', order: 2 },
+            { id: 'stg-3', name: '3. Kepompong', icon: '🥜', order: 3 },
+            { id: 'stg-4', name: '4. Kupu-Kupu', icon: '🦋', order: 4 }
+        ];
+
+        let dndPlaced = { 1: null, 2: null, 3: null, 4: null };
+
+        function resetDndGame() {
+            dndPlaced = { 1: null, 2: null, 3: null, 4: null };
+            state.selectedDndItem = null;
+            document.getElementById('dnd-feedback').classList.add('hidden');
+            renderDndBoard();
+        }
+
+        function renderDndBoard() {
+            const sourceBox = document.getElementById('dnd-source');
+            const targetGrid = document.getElementById('dnd-targets');
+            sourceBox.innerHTML = '';
+            targetGrid.innerHTML = '';
+
+            // Available items not placed yet
+            const unplaced = DND_ITEMS.filter(it => !Object.values(dndPlaced).some(p => p && p.id === it.id));
+
+            unplaced.forEach(item => {
+                const el = document.createElement('div');
+                const isSelected = state.selectedDndItem && state.selectedDndItem.id === item.id;
+                el.className = `p-3 bg-emerald-100 border-2 border-emerald-400 rounded-xl cursor-pointer text-center font-bold text-xs flex flex-col items-center gap-1 transition ${
+                    isSelected ? 'drag-selected bg-yellow-200' : 'hover:scale-105'
+                }`;
+                el.draggable = true;
+                el.innerHTML = `<span class="text-2xl">${item.icon}</span><span>${item.name}</span>`;
+
+                // Touch & Click selection
+                el.onclick = () => {
+                    playSound('click');
+                    state.selectedDndItem = item;
+                    renderDndBoard();
+                };
+
+                // Drag API
+                el.ondragstart = (e) => {
+                    e.dataTransfer.setData('text/plain', item.id);
+                };
+
+                sourceBox.appendChild(el);
+            });
+
+            // Target Slots (1..4)
+            for (let slotNum = 1; slotNum <= 4; slotNum++) {
+                const slot = document.createElement('div');
+                const placedItem = dndPlaced[slotNum];
+
+                slot.className = `min-h-[90px] border-2 border-dashed rounded-2xl p-2 flex flex-col items-center justify-center text-center transition ${
+                    placedItem ? 'bg-emerald-50 border-emerald-400' : 'bg-gray-100 border-gray-300 hover:bg-emerald-50'
+                }`;
+
+                if (placedItem) {
+                    slot.innerHTML = `
+                        <span class="text-2xl">${placedItem.icon}</span>
+                        <span class="text-xs font-bold text-emerald-800">${placedItem.name}</span>
+                        <span class="text-[10px] text-gray-400 font-normal">Slot ${slotNum}</span>
+                    `;
+                    slot.onclick = () => {
+                        playSound('click');
+                        dndPlaced[slotNum] = null;
+                        renderDndBoard();
+                    };
+                } else {
+                    slot.innerHTML = `
+                        <span class="text-xs text-gray-400 font-bold">Urutan ${slotNum}</span>
+                        <span class="text-[10px] text-gray-400">Klik / Letakkan di sini</span>
+                    `;
+                    slot.onclick = () => {
+                        if (state.selectedDndItem) {
+                            playSound('click');
+                            dndPlaced[slotNum] = state.selectedDndItem;
+                            state.selectedDndItem = null;
+                            renderDndBoard();
+                        }
+                    };
+                    slot.ondragover = (e) => e.preventDefault();
+                    slot.ondrop = (e) => {
+                        e.preventDefault();
+                        const itemId = e.dataTransfer.getData('text/plain');
+                        const itemObj = DND_ITEMS.find(i => i.id === itemId);
+                        if (itemObj) {
+                            dndPlaced[slotNum] = itemObj;
+                            renderDndBoard();
+                        }
+                    };
+                }
+                targetGrid.appendChild(slot);
+            }
+        }
+
+        function checkDndResult() {
+            const fb = document.getElementById('dnd-feedback');
+            fb.classList.remove('hidden');
+
+            let isAllCorrect = true;
+            for (let i = 1; i <= 4; i++) {
+                if (!dndPlaced[i] || dndPlaced[i].order !== i) {
+                    isAllCorrect = false;
+                    break;
+                }
+            }
+
+            if (isAllCorrect) {
+                playSound('correct');
+                fb.className = "text-xs text-center p-2 rounded-xl bg-emerald-100 text-emerald-800 font-bold border border-emerald-300";
+                fb.textContent = "🎉 Sempurna! Urutan siklus hidup kupu-kupu sudah tepat!";
+                addScore(30, 'b_dnd');
+            } else {
+                playSound('wrong');
+                fb.className = "text-xs text-center p-2 rounded-xl bg-rose-100 text-rose-800 font-bold border border-rose-300";
+                fb.textContent = "❌ Masih ada urutan yang tertukar. Periksa dan coba lagi ya!";
+            }
+        }
+
+        /* ----- GAME 3: MATCHING GAME ----- */
+        const MATCH_DATA = [
+            { animal: '🦋 Kupu-Kupu', type: 'Metamorfosis Sempurna' },
+            { animal: '🦗 Belalang', type: 'Metamorfosis Tidak Sempurna' },
+            { animal: '🐱 Kucing', type: 'Tanpa Metamorfosis' },
+            { animal: '🐸 Katak', type: 'Metamorfosis Sempurna' },
+            { animal: '🐔 Ayam', type: 'Tanpa Metamorfosis' }
+        ];
+
+        let matchPairs = {};
+
+        function resetMatchGame() {
+            matchPairs = {};
+            state.selectedMatchLeft = null;
+            document.getElementById('match-feedback').classList.add('hidden');
+            renderMatchBoard();
+        }
+
+        function renderMatchBoard() {
+            const leftCol = document.getElementById('match-left-col');
+            const rightCol = document.getElementById('match-right-col');
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            const typesList = ['Metamorfosis Sempurna', 'Metamorfosis Tidak Sempurna', 'Tanpa Metamorfosis'];
+
+            MATCH_DATA.forEach((item, idx) => {
+                const btnLeft = document.createElement('button');
+                const isSelected = state.selectedMatchLeft === idx;
+                const pairedType = matchPairs[idx];
+
+                btnLeft.className = `w-full p-2.5 rounded-xl border text-xs font-bold text-left flex justify-between items-center transition ${
+                    isSelected ? 'bg-amber-200 border-amber-400 ring-2 ring-amber-400' : pairedType ? 'bg-sky-100 border-sky-300 text-sky-900' : 'bg-white border-sky-200 hover:bg-sky-50'
+                }`;
+                btnLeft.innerHTML = `
+                    <span>${item.animal}</span>
+                    <span class="text-[10px] text-gray-500">${pairedType ? '➔ ' + pairedType : '➡️ Select'}</span>
+                `;
+                btnLeft.onclick = () => {
+                    playSound('click');
+                    state.selectedMatchLeft = idx;
+                    renderMatchBoard();
+                };
+                leftCol.appendChild(btnLeft);
+            });
+
+            typesList.forEach(tName => {
+                const btnRight = document.createElement('button');
+                btnRight.className = "w-full p-3 rounded-xl border border-sky-300 bg-sky-50 hover:bg-sky-100 text-sky-900 font-bold text-xs text-center transition";
+                btnRight.textContent = tName;
+                btnRight.onclick = () => {
+                    if (state.selectedMatchLeft !== null) {
+                        playSound('click');
+                        matchPairs[state.selectedMatchLeft] = tName;
+                        state.selectedMatchLeft = null;
+                        renderMatchBoard();
+                        checkMatchCompletion();
+                    }
+                };
+                rightCol.appendChild(btnRight);
+            });
+        }
+
+        function checkMatchCompletion() {
+            if (Object.keys(matchPairs).length === MATCH_DATA.length) {
+                const fb = document.getElementById('match-feedback');
+                fb.classList.remove('hidden');
+
+                let correctCount = 0;
+                MATCH_DATA.forEach((item, idx) => {
+                    if (matchPairs[idx] === item.type) correctCount++;
+                });
+
+                if (correctCount === MATCH_DATA.length) {
+                    playSound('correct');
+                    fb.className = "text-xs text-center p-2 rounded-xl bg-emerald-100 text-emerald-800 font-bold border border-emerald-300";
+                    fb.textContent = "🌟 Hebat Sekali! Semua pasangan hewan dan tipe metamorfosis benar!";
+                    addScore(30, 'b_match');
+                } else {
+                    playSound('wrong');
+                    fb.className = "text-xs text-center p-2 rounded-xl bg-rose-100 text-rose-800 font-bold border border-rose-300";
+                    fb.textContent = `Kamu menjawab ${correctCount} dari ${MATCH_DATA.length} dengan benar. Tekan Reset untuk mencoba lagi!`;
+                }
+            }
+        }
+
+        /* ----- GAME 4: FILL IN THE BLANK ----- */
+        const FILL_QUESTIONS = [
+            { text: "1. Kupu-kupu mengalami tahapan kepompong yang disebut ", ans: "Pupa", options: ["Larva", "Pupa", "Nimfa"] },
+            { text: "2. Anak belalang yang mirip hewan dewasa disebut ", ans: "Nimfa", options: ["Nimfa", "Kecebong", "Ulat"] },
+            { text: "3. Katak bernapas menggunakan ", ans: "Insang", options: ["Paru-paru", "Insang", "Kulit"] + " saat masih menjadi kecebong." },
+            { text: "4. Kucing dan ayam tumbuh ", ans: "Tanpa Metamorfosis", options: ["Tanpa Metamorfosis", "Metamorfosis Sempurna", "Metamorfosis Lambat"] },
+            { text: "5. Tahap ulat pada kupu-kupu disebut juga tahap ", ans: "Larva", options: ["Pupa", "Larva", "Dewasa"] }
+        ];
+
+        function initFillBlankGame() {
+            const container = document.getElementById('fillblank-questions-container');
+            container.innerHTML = '';
+
+            FILL_QUESTIONS.forEach((q, idx) => {
+                const box = document.createElement('div');
+                box.className = "p-3 bg-white rounded-xl border border-amber-200 text-xs font-semibold text-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-2";
+
+                const optsHtml = q.options.map(o => `<option value="${o}">${o}</option>`).join('');
+
+                box.innerHTML = `
+                    <span>${q.text}</span>
+                    <select id="fill-sel-${idx}" class="bg-amber-50 border border-amber-300 rounded-lg p-1.5 font-bold text-amber-900 text-xs">
+                        <option value="">-- Pilih Jawaban --</option>
+                        ${optsHtml}
+                    </select>
+                `;
+                container.appendChild(box);
+            });
+            document.getElementById('fillblank-feedback').classList.add('hidden');
+        }
+
+        function checkFillBlankResults() {
+            let correct = 0;
+            FILL_QUESTIONS.forEach((q, idx) => {
+                const val = document.getElementById(`fill-sel-${idx}`).value;
+                if (val === q.ans) correct++;
+            });
+
+            const fb = document.getElementById('fillblank-feedback');
+            fb.classList.remove('hidden');
+
+            if (correct === FILL_QUESTIONS.length) {
+                playSound('correct');
+                fb.className = "text-xs text-center p-2 rounded-xl bg-emerald-100 text-emerald-800 font-bold border border-emerald-300";
+                fb.textContent = "🎉 Luar Biasa! Semua kata rumpang terisi dengan benar!";
+                addScore(25, 'b_fill');
+            } else {
+                playSound('wrong');
+                fb.className = "text-xs text-center p-2 rounded-xl bg-amber-100 text-amber-800 font-bold border border-amber-300";
+                fb.textContent = `Kamu menjawab ${correct} dari ${FILL_QUESTIONS.length} dengan tepat. Coba periksa lagi!`;
+            }
+        }
+
+        /* ----- GAME 5: TRUE OR FALSE ----- */
+        const TF_QUESTIONS = [
+            { q: "1. Kupu-kupu mengalami tahap kepompong sebelum jadi dewasa.", ans: true },
+            { q: "2. Belalang memiliki tahap kepompong dalam daur hidupnya.", ans: false },
+            { q: "3. Katak menetas dari telur menjadi kecebong.", ans: true },
+            { q: "4. Kucing mengalami metamorfosis sempurna.", ans: false },
+            { q: "5. Ulat adalah nama lain dari tahap larva.", ans: true }
+        ];
+
+        let tfAnswers = {};
+
+        function initTrueFalseGame() {
+            tfAnswers = {};
+            const container = document.getElementById('tf-questions-container');
+            container.innerHTML = '';
+
+            TF_QUESTIONS.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = "p-3 bg-white rounded-xl border border-rose-200 flex items-center justify-between gap-2 text-xs font-semibold text-gray-800";
+                card.innerHTML = `
+                    <span>${q.q}</span>
+                    <div class="flex space-x-2">
+                        <button onclick="setTfAns(${idx}, true)" id="tf-btn-${idx}-true" class="px-3 py-1.5 rounded-lg border font-bold text-xs bg-gray-100 text-gray-700 hover:bg-emerald-100">
+                            👍 Benar
+                        </button>
+                        <button onclick="setTfAns(${idx}, false)" id="tf-btn-${idx}-false" class="px-3 py-1.5 rounded-lg border font-bold text-xs bg-gray-100 text-gray-700 hover:bg-rose-100">
+                            👎 Salah
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            document.getElementById('tf-feedback').classList.add('hidden');
+        }
+
+        function setTfAns(idx, val) {
+            playSound('click');
+            tfAnswers[idx] = val;
+
+            const btnTrue = document.getElementById(`tf-btn-${idx}-true`);
+            const btnFalse = document.getElementById(`tf-btn-${idx}-false`);
+
+            btnTrue.className = `px-3 py-1.5 rounded-lg border font-bold text-xs ${val === true ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-700'}`;
+            btnFalse.className = `px-3 py-1.5 rounded-lg border font-bold text-xs ${val === false ? 'bg-rose-500 text-white' : 'bg-gray-100 text-gray-700'}`;
+
+            checkTfCompletion();
+        }
+
+        function checkTfCompletion() {
+            if (Object.keys(tfAnswers).length === TF_QUESTIONS.length) {
+                let correct = 0;
+                TF_QUESTIONS.forEach((q, idx) => {
+                    if (tfAnswers[idx] === q.ans) correct++;
+                });
+
+                const fb = document.getElementById('tf-feedback');
+                fb.classList.remove('hidden');
+
+                if (correct === TF_QUESTIONS.length) {
+                    playSound('correct');
+                    fb.className = "text-xs text-center p-2 rounded-xl bg-emerald-100 text-emerald-800 font-bold border border-emerald-300";
+                    fb.textContent = "🌟 Hebat! Semua tebakan Benar/Salah kamu tepat seratus persen!";
+                    addScore(25, 'b_tf');
+                } else {
+                    playSound('wrong');
+                    fb.className = "text-xs text-center p-2 rounded-xl bg-rose-100 text-rose-800 font-bold border border-rose-300";
+                    fb.textContent = `Kamu berhasil menjawab ${correct} dari ${TF_QUESTIONS.length} dengan benar!`;
+                }
+            }
+        }
+
+        /* ----- GAME 6: TIMER CHALLENGE ----- */
+        const TC_QUESTIONS = [
+            { q: "Hewan manakah yang bertelur?", opts: ["Kucing", "Ayam", "Sapi", "Anjing"], ans: 1 },
+            { q: "Tahap kepompong disebut juga...", opts: ["Larva", "Nimfa", "Pupa", "Dewasa"], ans: 2 },
+            { q: "Capung mengalami metamorfosis...", opts: ["Sempurna", "Tidak Sempurna", "Tanpa Metamorfosis", "Buatan"], ans: 1 },
+            { q: "Anak katak berenang menggunakan...", opts: ["Kaki", "Sayap", "Ekor & Insang", "Paru-paru"], ans: 2 },
+            { q: "Ulat bertugas untuk...", opts: ["Terbang", "Makan Daun", "Tidur", "Bertelur"], ans: 1 }
+        ];
+
+        let tcCurrentQ = 0;
+
+        function startTimerChallenge() {
+            playSound('click');
+            state.timerChallenge.timer = 30;
+            state.timerChallenge.streak = 0;
+            state.timerChallenge.score = 0;
+            tcCurrentQ = 0;
+
+            document.getElementById('tc-start-screen').classList.add('hidden');
+            document.getElementById('tc-result-screen').classList.add('hidden');
+            document.getElementById('tc-play-screen').classList.remove('hidden');
+
+            renderTcQuestion();
+
+            clearInterval(state.timerChallenge.interval);
+            state.timerChallenge.interval = setInterval(() => {
+                state.timerChallenge.timer--;
+                document.getElementById('tc-timer').textContent = state.timerChallenge.timer;
+
+                if (state.timerChallenge.timer <= 0) {
+                    clearInterval(state.timerChallenge.interval);
+                    finishTimerChallenge();
+                }
+            }, 1000);
+        }
+
+        function renderTcQuestion() {
+            const qData = TC_QUESTIONS[tcCurrentQ % TC_QUESTIONS.length];
+            document.getElementById('tc-question-text').textContent = qData.q;
+            document.getElementById('tc-streak').textContent = `${state.timerChallenge.streak} 🔥`;
+
+            const optsBox = document.getElementById('tc-options');
+            optsBox.innerHTML = '';
+
+            qData.opts.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-red-50 hover:bg-red-100 text-red-900 border border-red-200 font-bold p-3 rounded-xl text-xs transition card-shadow-sm";
+                btn.textContent = opt;
+                btn.onclick = () => {
+                    if (idx === qData.ans) {
+                        playSound('correct');
+                        state.timerChallenge.streak++;
+                        state.timerChallenge.score += 10;
+                    } else {
+                        playSound('wrong');
+                        state.timerChallenge.streak = 0;
+                    }
+                    tcCurrentQ++;
+                    renderTcQuestion();
+                };
+                optsBox.appendChild(btn);
+            });
+        }
+
+        function finishTimerChallenge() {
+            playSound('win');
+            document.getElementById('tc-play-screen').classList.add('hidden');
+            document.getElementById('tc-result-screen').classList.remove('hidden');
+            document.getElementById('tc-final-score').textContent = `Kamu mengumpulkan ${state.timerChallenge.score} Poin Tantangan Cepat!`;
+            addScore(state.timerChallenge.score, 'b_tc');
+        }
+
+        /* ================= KUIS UTAMA ================= */
+        const QUIZ_DATA = [
+            {
+                q: "1. Perhatikan urutan berikut: Telur ➔ Larva ➔ Kepompong ➔ Dewasa. Hewan yang memiliki urutan daur hidup tersebut adalah...",
+                opts: ["A. Kecoa dan Belalang", "B. Kupu-kupu dan Lalat", "C. Ayam dan Bebek", "D. Kucing dan Sapi"],
+                ans: 1,
+                exp: "Metamorfosis sempurna melewati 4 tahap: Telur ➔ Larva (Ulat) ➔ Pupa (Kepompong) ➔ Dewasa. Contohnya kupu-kupu dan lalat."
+            },
+            {
+                q: "2. Mengapa belalang dikatakan mengalami metamorfosis TIDAK sempurna?",
+                opts: ["A. Karena menetas langsung jadi belalang dewasa", "B. Karena tidak memiliki tahap kepompong (pupa)", "C. Karena tidak bertelur", "D. Karena berubah menjadi ulat terlebih dahulu"],
+                ans: 1,
+                exp: "Metamorfosis tidak sempurna hanya memiliki 3 tahap (Telur ➔ Nimfa ➔ Dewasa) tanpa melewati tahap kepompong."
+            },
+            {
+                q: "3. Kecebong bernapas menggunakan insang. Ketika tumbuh menjadi katak dewasa, alat pernapasan utamanya berubah menjadi...",
+                opts: ["A. Insang luar", "B. Paru-paru dan kulit", "C. Trakea", "D. Sirip"],
+                ans: 1,
+                exp: "Katak adalah hewan amfibi. Saat muda (kecebong) bernapas dengan insang di air, dan saat dewasa bernapas dengan paru-paru serta kulit di darat."
+            },
+            {
+                q: "4. Manakah kelompok hewan di bawah ini yang seluruhnya tumbuh TANPA mengalami metamorfosis?",
+                opts: ["A. Nyamuk, Katak, Lalat", "B. Kucing, Ayam, Sapi", "C. Belalang, Capung, Kecoa", "D. Kupu-kupu, Semut, Lebah"],
+                ans: 1,
+                exp: "Kucing, ayam, dan sapi lahir/menetas dengan bentuk tubuh yang sama seperti induknya, hanya ukurannya yang bertambah besar."
+            },
+            {
+                q: "5. Jika di suatu taman banyak terjadi perburuan ulat, apa yang akan terjadi pada populasi kupu-kupu?",
+                opts: ["A. Jumlah kupu-kupu bertambah banyak", "B. Jumlah kupu-kupu akan berkurang karena ulat adalah tahap muda kupu-kupu", "C. Kupu-kupu akan bertelur lebih cepat", "D. Tidak ada pengaruhnya"],
+                ans: 1,
+                exp: "Ulat adalah tahap larva dari kupu-kupu. Jika ulat berkurang, maka tidak ada yang tumbuh menjadi kupu-kupu dewasa."
+            }
+        ];
+
+        function loadQuizQuestion() {
+            const q = QUIZ_DATA[state.quizIndex];
+            document.getElementById('quiz-progress-badge').textContent = `Soal ${state.quizIndex + 1} / ${QUIZ_DATA.length}`;
+            document.getElementById('quiz-question-title').textContent = q.q;
+
+            const optsBox = document.getElementById('quiz-options-container');
+            optsBox.innerHTML = '';
+
+            const userAns = state.quizAnswers[state.quizIndex];
+
+            q.opts.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                const isSelected = userAns === idx;
+
+                btn.className = `w-full p-3 rounded-xl border text-xs md:text-sm font-bold text-left transition ${
+                    isSelected ? 'bg-purple-600 text-white border-purple-700' : 'bg-white text-gray-800 border-purple-200 hover:bg-purple-100'
+                }`;
+                btn.textContent = optText;
+                btn.onclick = () => selectQuizAnswer(idx);
+                optsBox.appendChild(btn);
+            });
+
+            // Explanation box handle
+            const expBox = document.getElementById('quiz-explanation-box');
+            if (userAns !== undefined) {
+                expBox.classList.remove('hidden');
+                const isCorrect = userAns === q.ans;
+                if (isCorrect) {
+                    expBox.className = "p-4 rounded-xl border text-xs space-y-1 bg-emerald-100 border-emerald-300 text-emerald-900";
+                    document.getElementById('quiz-feedback-title').textContent = "✅ Jawabanmu Benar!";
+                } else {
+                    expBox.className = "p-4 rounded-xl border text-xs space-y-1 bg-rose-100 border-rose-300 text-rose-900";
+                    document.getElementById('quiz-feedback-title').textContent = "❌ Jawaban Kurang Tepat!";
+                }
+                document.getElementById('quiz-explanation-text').textContent = q.exp;
+            } else {
+                expBox.classList.add('hidden');
+            }
+
+            // Buttons state
+            document.getElementById('quiz-prev-btn').disabled = state.quizIndex === 0;
+            const nextBtn = document.getElementById('quiz-next-btn');
+            nextBtn.textContent = state.quizIndex === QUIZ_DATA.length - 1 ? "Selesai & Lihat Hasil 🏆" : "Lanjut ➡️";
+        }
+
+        function selectQuizAnswer(ansIdx) {
+            playSound('click');
+            const q = QUIZ_DATA[state.quizIndex];
+            state.quizAnswers[state.quizIndex] = ansIdx;
+
+            if (ansIdx === q.ans) {
+                playSound('correct');
+                addScore(20, 'b_quiz');
+            } else {
+                playSound('wrong');
+            }
+
+            loadQuizQuestion();
+        }
+
+        function prevQuizQuestion() {
+            if (state.quizIndex > 0) {
+                state.quizIndex--;
+                loadQuizQuestion();
+            }
+        }
+
+        function nextQuizQuestion() {
+            if (state.quizIndex < QUIZ_DATA.length - 1) {
+                state.quizIndex++;
+                loadQuizQuestion();
+            } else {
+                navigateTo('hasil');
+            }
+        }
+
+        /* Initialize App on Load */
+        window.onload = function() {
+            updateScoreAndProgressUI();
+            navigateTo('beranda');
+        };
+    </script>
+</body>
+</html>
